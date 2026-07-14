@@ -6,13 +6,13 @@ export default function Home({ navigation }) {
       <Text style={styles.titulo}>🏆 LJLK Sports</Text>
 
       <Button
-        title="Ver Produtos"
-        onPress={() => navigation.navigate('Produtos')}
+        title="Login"
+        onPress={() => navigation.navigate('Login')}
       />
 
       <Button
-        title="Login"
-        onPress={() => navigation.navigate('Login')}
+        title="Cadastro Usuarios"
+        onPress={() => navigation.navigate('CadastroUsuario')}
       />
 
       <Button
