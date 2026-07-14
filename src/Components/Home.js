@@ -16,6 +16,12 @@ export default function Home({ navigation }) {
       />
 
       <Button
+        title="Usuarios"
+        onPress={() => navigation.navigate('Usuarios')}
+        />
+
+
+      <Button
         title="Fale Conosco"
         onPress={() => navigation.navigate('FaleConosco')}
       />
