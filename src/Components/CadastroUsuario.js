@@ -13,7 +13,7 @@ export default function CadastroUsuario({ navigation }) {
       return;
     }
 
-    const apenasNumeros = text.replace(/\D/g, '');
+    const apenasNumeros = texto.replace(/\D/g, '');
     
     const cpfFormatado = apenasNumeros
       .replace(/(\d{3})(\d)/, '$1.$2')
@@ -24,10 +24,10 @@ export default function CadastroUsuario({ navigation }) {
   };
 
   const lidarComSalvar = () => {
+    // 1. Salva os dados do usuário
     console.log('Dados do Usuário Salvos:', { nome, CPF, email, senha });
-  };
 
-  const irParaProdutos = () => {
+    // 2. Redireciona para a tela de produtos
     navigation.navigate('Produtos');
   };
 
@@ -72,14 +72,9 @@ export default function CadastroUsuario({ navigation }) {
         secureTextEntry={true}
       />
 
-      {/* Botão Salvar (Vermelho) */}
+      {/* Botão Salvar (que também navega para Produtos) */}
       <TouchableOpacity style={styles.botaoSalvar} onPress={lidarComSalvar}>
         <Text style={styles.textoBotaoSalvar}>SALVAR</Text>
-      </TouchableOpacity>
-
-      {/* Botão Ir Para Produtos (Preto) */}
-      <TouchableOpacity style={styles.botaoProdutos} onPress={irParaProdutos}>
-        <Text style={styles.textoBotaoProdutos}>IR PARA PRODUTOS →</Text>
       </TouchableOpacity>
     </View>
   );
@@ -118,19 +113,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   textoBotaoSalvar: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  botaoProdutos: {
-    backgroundColor: '#000000',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 14,
-  },
-  textoBotaoProdutos: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',

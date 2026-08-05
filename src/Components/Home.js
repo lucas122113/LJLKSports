@@ -27,20 +27,6 @@ export default function Home({ navigation }) {
 
         <TouchableOpacity 
           style={styles.botaoSecundario} 
-          onPress={() => navigation.navigate('CadastroUsuario')}
-        >
-          <Text style={styles.textoBotaoSecundario}>Cadastro de Usuários</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.botaoSecundario} 
-          onPress={() => navigation.navigate('Usuarios')}
-        >
-          <Text style={styles.textoBotaoSecundario}>Usuários</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.botaoSecundario} 
           onPress={() => navigation.navigate('FaleConosco')}
         >
           <Text style={styles.textoBotaoSecundario}>Fale Conosco</Text>

@@ -1,3 +1,4 @@
+import { TouchableOpacity, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -18,12 +19,35 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: '#121212' },
+          headerTintColor: '#E50914', // Cor dos títulos e botões do header
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      >
 
         <Stack.Screen 
           name="Home" 
           component={Home} 
-          options={{ title: 'Início' }}
+          options={({ navigation }) => ({
+            title: 'Início',
+            headerRight: () => (
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Perfil')}
+                style={{
+                  backgroundColor: '#E50914',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 6,
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 }}>
+                  Perfil
+                </Text>
+              </TouchableOpacity>
+            ),
+          })}
         />
 
         <Stack.Screen 
@@ -89,4 +113,4 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+}   

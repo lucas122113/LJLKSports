@@ -68,14 +68,14 @@ export default function Usuarios() {
       <Text style={styles.titulo}>LISTA DE USUÁRIOS</Text>
 
       {editandoId ? (
-        // Formulário de Edição (exibido apenas quando um usuário é selecionado)
+        // Formulário de Edição
         <View style={styles.formulario}>
           <Text style={styles.subtitulo}>EDITAR USUÁRIO</Text>
 
           <TextInput
             style={styles.input}
             placeholder="Nome Completo"
-            placeholderTextColor="#999"
+            placeholderTextColor="#888888"
             value={nome}
             onChangeText={setNome}
           />
@@ -83,7 +83,7 @@ export default function Usuarios() {
           <TextInput
             style={styles.input}
             placeholder="CPF"
-            placeholderTextColor="#999"
+            placeholderTextColor="#888888"
             value={CPF}
             onChangeText={formatarCPF}
             keyboardType="numeric"
@@ -93,7 +93,7 @@ export default function Usuarios() {
           <TextInput
             style={styles.input}
             placeholder="E-mail"
-            placeholderTextColor="#999"
+            placeholderTextColor="#888888"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -105,7 +105,7 @@ export default function Usuarios() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.botaoCancelar} onPress={cancelarEdicao}>
-            <Text style={styles.textoBotaoPreto}>CANCELAR</Text>
+            <Text style={styles.textoBotaoCancelar}>CANCELAR</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -113,6 +113,7 @@ export default function Usuarios() {
         <FlatList
           data={usuarios}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <View style={styles.cartaoUsuario}>
               <View style={styles.info}>
@@ -138,101 +139,104 @@ export default function Usuarios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#121212', // Fundo preto escuro
   },
   titulo: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 20,
     textAlign: 'center',
-    color: '#000000',
-    letterSpacing: 1,
-    marginTop: 40,
+    color: '#E50914', // Vermelho destaque
+    letterSpacing: 1.5,
+    marginTop: 20,
+    textTransform: 'uppercase',
   },
   subtitulo: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#D60000',
+    marginBottom: 20,
+    color: '#E50914',
     textAlign: 'center',
+    letterSpacing: 1,
   },
   formulario: {
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: '#1E1E1E', // Preto levemente destacado
     padding: 20,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E50914', // Borda vermelha
   },
   input: {
-    borderWidth: 2,
-    borderColor: '#000000',
-    color: '#000000',
+    backgroundColor: '#121212',
+    borderWidth: 1,
+    borderColor: '#333333',
+    color: '#FFFFFF', // Texto digitado em branco
     padding: 14,
     marginBottom: 16,
     borderRadius: 8,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    fontSize: 15,
   },
   botaoSalvar: {
-    backgroundColor: '#D60000', // Vermelho
+    backgroundColor: '#E50914', // Botão vermelho principal
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 12,
   },
   botaoCancelar: {
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#FFFFFF', // Borda branca
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
   textoBotaoBranco: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
-  textoBotaoPreto: {
-    color: '#000000',
-    fontSize: 16,
+  textoBotaoCancelar: {
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: 'bold',
   },
   cartaoUsuario: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#000000',
+    backgroundColor: '#1E1E1E',
+    borderLeftWidth: 4,
+    borderLeftColor: '#E50914', // Borda lateral em vermelho
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
-    backgroundColor: '#FFFFFF',
   },
   info: {
     flex: 1,
     marginRight: 12,
   },
   nome: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#FFFFFF', // Nome em branco
     marginBottom: 4,
   },
   detalhe: {
-    fontSize: 14,
-    color: '#555555',
+    fontSize: 13,
+    color: '#B0B0B0', // Cinza claro para os detalhes
+    marginTop: 2,
   },
   botaoEditar: {
-    backgroundColor: '#000000', // Preto
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    backgroundColor: '#E50914', // Botão de ação em vermelho
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 6,
   },
   textoBotaoEditar: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
   },
-});
+})
