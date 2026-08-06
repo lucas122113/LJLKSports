@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 export default function Usuarios() {
-  // Lista inicial de usuários aleatórios
+
   const [usuarios, setUsuarios] = useState([
     { id: '1', nome: 'Ana Souza', CPF: '111.222.333-44', email: 'ana.souza@email.com' },
     { id: '2', nome: 'Lucas Lima', CPF: '555.666.777-88', email: 'lucas.lima@email.com' },
@@ -10,13 +10,13 @@ export default function Usuarios() {
     { id: '4', nome: 'Pedro Alves', CPF: '444.555.666-77', email: 'pedro.alves@email.com' },
   ]);
 
-  // Estados para controlar a edição
+
   const [editandoId, setEditandoId] = useState(null);
   const [nome, setNome] = useState('');
   const [CPF, setCPF] = useState('');
   const [email, setEmail] = useState('');
 
-  // Máscara de CPF
+
   const formatarCPF = (texto) => {
     if (!texto) {
       setCPF('');
@@ -30,7 +30,7 @@ export default function Usuarios() {
     setCPF(cpfFormatado);
   };
 
-  // Ativa o modo de edição para o usuário selecionado
+ 
   const iniciarEdicao = (usuario) => {
     setEditandoId(usuario.id);
     setNome(usuario.nome);
@@ -38,7 +38,7 @@ export default function Usuarios() {
     setEmail(usuario.email);
   };
 
-  // Salva as alterações na lista
+ 
   const salvarAlteracoes = () => {
     if (!nome || !CPF || !email) {
       Alert.alert('Erro', 'Preencha todos os campos.');
@@ -51,14 +51,14 @@ export default function Usuarios() {
       )
     );
 
-    // Limpa o formulário e sai do modo de edição
+   
     setEditandoId(null);
     setNome('');
     setCPF('');
     setEmail('');
   };
 
-  // Cancela a edição
+
   const cancelarEdicao = () => {
     setEditandoId(null);
   };
@@ -68,7 +68,7 @@ export default function Usuarios() {
       <Text style={styles.titulo}>LISTA DE USUÁRIOS</Text>
 
       {editandoId ? (
-        // Formulário de Edição
+
         <View style={styles.formulario}>
           <Text style={styles.subtitulo}>EDITAR USUÁRIO</Text>
 
@@ -109,7 +109,7 @@ export default function Usuarios() {
           </TouchableOpacity>
         </View>
       ) : (
-        // Lista de Usuários
+    
         <FlatList
           data={usuarios}
           keyExtractor={(item) => item.id}
@@ -140,14 +140,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#121212', // Fundo preto escuro
+    backgroundColor: '#121212', 
   },
   titulo: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#E50914', // Vermelho destaque
+    color: '#E50914', 
     letterSpacing: 1.5,
     marginTop: 20,
     textTransform: 'uppercase',
@@ -161,24 +161,24 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   formulario: {
-    backgroundColor: '#1E1E1E', // Preto levemente destacado
+    backgroundColor: '#1E1E1E', 
     padding: 20,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E50914', // Borda vermelha
+    borderColor: '#E50914',
   },
   input: {
     backgroundColor: '#121212',
     borderWidth: 1,
     borderColor: '#333333',
-    color: '#FFFFFF', // Texto digitado em branco
+    color: '#FFFFFF',
     padding: 14,
     marginBottom: 16,
     borderRadius: 8,
     fontSize: 15,
   },
   botaoSalvar: {
-    backgroundColor: '#E50914', // Botão vermelho principal
+    backgroundColor: '#E50914',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   botaoCancelar: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#FFFFFF', // Borda branca
+    borderColor: '#FFFFFF', 
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1E1E1E',
     borderLeftWidth: 4,
-    borderLeftColor: '#E50914', // Borda lateral em vermelho
+    borderLeftColor: '#E50914',
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
@@ -220,16 +220,16 @@ const styles = StyleSheet.create({
   nome: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Nome em branco
+    color: '#FFFFFF', 
     marginBottom: 4,
   },
   detalhe: {
     fontSize: 13,
-    color: '#B0B0B0', // Cinza claro para os detalhes
+    color: '#B0B0B0', 
     marginTop: 2,
   },
   botaoEditar: {
-    backgroundColor: '#E50914', // Botão de ação em vermelho
+    backgroundColor: '#E50914', 
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 6,
