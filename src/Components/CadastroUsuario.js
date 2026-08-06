@@ -119,3 +119,4 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 });
+//finalizado
