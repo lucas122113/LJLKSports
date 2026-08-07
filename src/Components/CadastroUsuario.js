@@ -1,46 +1,123 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CadastroUsuario({ navigation }) {
   const [nome, setNome] = useState('');
   const [CPF, setCPF] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [mensagemErro, setMensagemErro] = useState('');
 
+  // Formatação de CPF mais segura
   const formatarCPF = (texto) => {
-    if (!texto) {
-      setCPF('');
+    setMensagemErro(''); // Limpa mensagens de erro ao digitar
+    const apenasNumeros = texto.replace(/\D/g, '');
+    
+    if (apenasNumeros.length <= 11) {
+      const cpfFormatado = apenasNumeros
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      
+      setCPF(cpfFormatado);
+    }
+  };
+
+  const lidarComSalvar = async () => {
+    // Esconde o teclado para garantir que o Alert apareça
+    Keyboard.dismiss();
+    setMensagemErro('');
+
+    // 1. Validação de campos vazios
+    if (!nome.trim() || !email.trim() || !senha.trim()) {
+      const msg = 'Por favor, preencha Nome, E-mail e Senha!';
+      setMensagemErro(msg);
+      Alert.alert('Campos Obrigatórios', msg);
       return;
     }
 
-    const apenasNumeros = texto.replace(/\D/g, '');
-    
-    const cpfFormatado = apenasNumeros
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    // Validação básica de formato de E-mail
+    const emailValido = /\S+@\S+\.\S+/.test(email);
+    if (!emailValido) {
+      const msg = 'Por favor, digite um e-mail válido!';
+      setMensagemErro(msg);
+      Alert.alert('E-mail Inválido', msg);
+      return;
+    }
 
-    setCPF(cpfFormatado);
-  };
+    try {
+      const novoUsuario = { 
+        id: String(Date.now()),
+        nome: nome.trim(), 
+        CPF: CPF.trim(), 
+        email: email.trim().toLowerCase(), 
+        senha: senha.trim() 
+      };
 
-  const lidarComSalvar = () => {
-    // 1. Salva os dados do usuário
-    console.log('Dados do Usuário Salvos:', { nome, CPF, email, senha });
+      // 2. Busca a lista existente
+      const listaSalva = await AsyncStorage.getItem('@lista_usuarios');
+      const usuariosExistentes = listaSalva ? JSON.parse(listaSalva) : [];
 
-    // 2. Redireciona para a tela de produtos
-    navigation.navigate('Produtos');
+      // 3. Verifica se o e-mail já existe de forma segura
+      const emailExiste = usuariosExistentes.some(
+        (u) => u && u.email && u.email.toLowerCase() === novoUsuario.email
+      );
+
+      if (emailExiste) {
+        const msg = 'Este e-mail já está cadastrado!';
+        setMensagemErro(msg);
+        Alert.alert('Atenção', msg);
+        return;
+      }
+
+      // 4. Salva a nova lista
+      const novaLista = [...usuariosExistentes, novoUsuario];
+      await AsyncStorage.setItem('@lista_usuarios', JSON.stringify(novaLista));
+
+      // Limpa formulário e navega
+      Alert.alert('Sucesso!', 'Usuário cadastrado com sucesso.', [
+        {
+          text: 'OK',
+          onPress: () => {
+            setNome('');
+            setCPF('');
+            setEmail('');
+            setSenha('');
+            setMensagemErro('');
+
+            if (navigation && navigation.navigate) {
+              navigation.navigate('Login');
+            }
+          }
+        }
+      ]);
+
+    } catch (error) {
+      console.error('Erro ao salvar usuário:', error);
+      const msg = 'Não foi possível salvar os dados do usuário.';
+      setMensagemErro(msg);
+      Alert.alert('Erro', msg);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>CADASTRO DE USUÁRIO</Text>
 
+      {/* Exibe mensagem de erro diretamente na tela */}
+      {mensagemErro !== '' && (
+        <View style={styles.boxErro}>
+          <Text style={styles.textoErro}>{mensagemErro}</Text>
+        </View>
+      )}
+
       <TextInput
         style={styles.input}
-        placeholder="Nome Completo"
+        placeholder="Nome Completo *"
         placeholderTextColor="#999"
         value={nome}
-        onChangeText={setNome}
+        onChangeText={(t) => { setNome(t); setMensagemErro(''); }}
       />
 
       <TextInput
@@ -55,25 +132,28 @@ export default function CadastroUsuario({ navigation }) {
 
       <TextInput
         style={styles.input}
-        placeholder="E-mail"
+        placeholder="E-mail *"
         placeholderTextColor="#999"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(t) => { setEmail(t); setMensagemErro(''); }}
         keyboardType="email-address"
         autoCapitalize="none"
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Senha"
+        placeholder="Senha *"
         placeholderTextColor="#999"
         value={senha}
-        onChangeText={setSenha}
+        onChangeText={(t) => { setSenha(t); setMensagemErro(''); }}
         secureTextEntry={true}
       />
 
-      {/* Botão Salvar (que também navega para Produtos) */}
-      <TouchableOpacity style={styles.botaoSalvar} onPress={lidarComSalvar}>
+      <TouchableOpacity 
+        style={styles.botaoSalvar} 
+        onPress={lidarComSalvar}
+        activeOpacity={0.7}
+      >
         <Text style={styles.textoBotaoSalvar}>SALVAR</Text>
       </TouchableOpacity>
     </View>
@@ -90,10 +170,24 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 20,
     textAlign: 'center',
     color: '#000000',
     letterSpacing: 1,
+  },
+  boxErro: {
+    backgroundColor: '#FFE5E5',
+    borderColor: '#D60000',
+    borderWidth: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  textoErro: {
+    color: '#D60000',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   input: {
     borderWidth: 2,

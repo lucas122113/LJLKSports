@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons'; 
-// Se não usar Expo, altere para: import Feather from 'react-native-vector-icons/Feather';
 
+const USUARIOS = () => {
+    navigation.navigate('Usuarios');
+  };
 export default function Perfil() {
   return (
     <ScrollView style={styles.container}>
@@ -62,9 +64,19 @@ export default function Perfil() {
         <Feather name="log-out" size={20} color="#FFFFFF" />
         <Text style={styles.textoBotaoSair}>Sair da Conta</Text>
       </TouchableOpacity>
+       <TouchableOpacity style={styles.botaoEditar} onPress={USUARIOS}>
+          <Text style={styles.textoBotaoEditar}>EDITAR USUÁRIOS</Text>
+        </TouchableOpacity>
+         <TouchableOpacity style={styles.botaoEditar} onPress={USUARIOS}>
+                <Text style={styles.textoBotaoEditar}>VER / EDITAR USUÁRIOS</Text>
+              </TouchableOpacity>
     </ScrollView>
+
+
+  
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

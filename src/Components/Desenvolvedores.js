@@ -6,7 +6,7 @@ export default function Desenvolvedores() {
       <Text style={styles.titulo}>Desenvolvido por:</Text>
       
       <View style={styles.cardDevs}>
-        <Text style={styles.nomeDev}>Lucas W.</Text>
+        <Text style={styles.nomeDev}>W.Lucas</Text>
         <Text style={styles.nomeDev}>Lucas Santana</Text>
         <Text style={styles.nomeDev}>Jhonatan Lopes</Text>
         <Text style={styles.nomeDev}>Kayke Sidney</Text>

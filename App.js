@@ -32,21 +32,9 @@ export default function App() {
           component={Home} 
           options={({ navigation }) => ({
             title: 'Início',
-            headerRight: () => (
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('Perfil')}
-                style={{
-                  backgroundColor: '#E50914',
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 6,
-                }}
-              >
-                <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 }}>
-                  Perfil
-                </Text>
-              </TouchableOpacity>
-            ),
+         
+             
+           
           })}
         />
 
@@ -113,4 +101,4 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}   
+}

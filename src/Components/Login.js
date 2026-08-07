@@ -9,19 +9,39 @@ import {
   KeyboardAvoidingView, 
   Platform 
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Correção 1: Adicionado { navigation } nas props para permitir a navegação
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  function entrar() {
-    if (email.trim() && senha.trim()) {
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
-    } else {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+  const lidarComLogin = async () => {
+    if (!email.trim() || !senha.trim()) {
+      Alert.alert('Atenção', 'Por favor, preencha o e-mail e a senha.');
+      return;
     }
-  }
+
+    try {
+      // 1. Busca a lista completa de usuários cadastrados
+      const listaSalva = await AsyncStorage.getItem('@lista_usuarios');
+      const usuarios = listaSalva ? JSON.parse(listaSalva) : [];
+
+      // 2. Busca pelo e-mail e senha correspondentes
+      const usuarioValido = usuarios.find(
+        (u) => u.email?.toLowerCase() === email.trim().toLowerCase() && u.senha === senha
+      );
+
+      if (usuarioValido) {
+        Alert.alert('Sucesso', `Bem-vindo(a), ${usuarioValido.nome || 'Usuário'}!`);
+        navigation.navigate('Produtos');
+      } else {
+        Alert.alert('Erro', 'E-mail ou senha incorretos.');
+      }
+    } catch (e) {
+      console.error('Erro ao ler login:', e);
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
+    }
+  };
 
   return (
     <KeyboardAvoidingView 
@@ -61,13 +81,12 @@ export default function Login({ navigation }) {
 
         <TouchableOpacity 
           style={styles.botaoEntrar} 
-          onPress={() => navigation?.navigate('Produtos')}
+          onPress={lidarComLogin}
           activeOpacity={0.8}
         >
-          <Text style={styles.textoBotaoSecundario}>ENTRAR</Text>
+          <Text style={styles.textoBotao}>ENTRAR</Text>
         </TouchableOpacity>
 
-        {/* Botão Secundário de Cadastro */}
         <TouchableOpacity 
           style={styles.botaoSecundario} 
           onPress={() => navigation?.navigate('CadastroUsuario')}
@@ -83,16 +102,16 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Fundo preto escuro
+    backgroundColor: '#121212',
     justifyContent: 'center',
     padding: 24,
   },
   card: {
-    backgroundColor: '#1E1E1E', // Cartão preto de alto contraste
+    backgroundColor: '#1E1E1E',
     borderRadius: 16,
     padding: 24,
     borderTopWidth: 4,
-    borderTopColor: '#E50914', // Detalhe superior vermelho
+    borderTopColor: '#E50914',
   },
   logoText: {
     fontSize: 28,
@@ -102,7 +121,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   logoHighlight: {
-    color: '#E50914', // Vermelho destaque
+    color: '#E50914',
   },
   subtitulo: {
     fontSize: 13,
@@ -128,11 +147,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: '#FFFFFF', // Texto em branco
+    color: '#FFFFFF',
     fontSize: 15,
   },
   botaoEntrar: {
-    backgroundColor: '#E50914', // Botão principal vermelho
+    backgroundColor: '#E50914',
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
@@ -144,11 +163,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: 1,
   },
-  // Correção 2: Estilos adicionados para o botão secundário e texto
   botaoSecundario: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#E50914', // Borda em vermelho
+    borderColor: '#E50914',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -159,4 +177,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
   },
-}); 
+});

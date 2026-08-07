@@ -1,22 +1,53 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const CHAVE_STORAGE = '@lista_usuarios';
 
 export default function Usuarios() {
-  // Lista inicial de usuários aleatórios
-  const [usuarios, setUsuarios] = useState([
-    { id: '1', nome: 'Ana Souza', CPF: '111.222.333-44', email: 'ana.souza@email.com' },
-    { id: '2', nome: 'Lucas Lima', CPF: '555.666.777-88', email: 'lucas.lima@email.com' },
-    { id: '3', nome: 'Mariana Costa', CPF: '999.888.777-66', email: 'mariana.costa@email.com' },
-    { id: '4', nome: 'Pedro Alves', CPF: '444.555.666-77', email: 'pedro.alves@email.com' },
-  ]);
+  const [usuarios, setUsuarios] = useState([]);
 
-  // Estados para controlar a edição
   const [editandoId, setEditandoId] = useState(null);
   const [nome, setNome] = useState('');
   const [CPF, setCPF] = useState('');
   const [email, setEmail] = useState('');
 
-  // Máscara de CPF
+  // 1. Carrega os usuários salvos no AsyncStorage assim que a tela abre
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  const carregarUsuarios = async () => {
+    try {
+      const dadosSalvos = await AsyncStorage.getItem(CHAVE_STORAGE);
+      if (dadosSalvos !== null) {
+        setUsuarios(JSON.parse(dadosSalvos));
+      } else {
+        // Se ainda não houver dados salvos, usa a lista padrão inicial
+        const dadosIniciais = [
+          { id: '1', nome: 'Ana Souza', CPF: '111.222.333-44', email: 'ana.souza@email.com' },
+          { id: '2', nome: 'Lucas Lima', CPF: '555.666.777-88', email: 'lucas.lima@email.com' },
+          { id: '3', nome: 'Mariana Costa', CPF: '999.888.777-66', email: 'mariana.costa@email.com' },
+          { id: '4', nome: 'Pedro Alves', CPF: '444.555.666-77', email: 'pedro.alves@email.com' },
+        ];
+        setUsuarios(dadosIniciais);
+        await AsyncStorage.setItem(CHAVE_STORAGE, JSON.stringify(dadosIniciais));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+    }
+  };
+
+  // Função auxiliar para salvar a lista completa no storage
+  const salvarNoStorage = async (novaLista) => {
+    try {
+      await AsyncStorage.setItem(CHAVE_STORAGE, JSON.stringify(novaLista));
+    } catch (error) {
+      console.error('Erro ao salvar no storage:', error);
+      Alert.alert('Erro', 'Não foi possível salvar as alterações localmente.');
+    }
+  };
+
   const formatarCPF = (texto) => {
     if (!texto) {
       setCPF('');
@@ -30,7 +61,6 @@ export default function Usuarios() {
     setCPF(cpfFormatado);
   };
 
-  // Ativa o modo de edição para o usuário selecionado
   const iniciarEdicao = (usuario) => {
     setEditandoId(usuario.id);
     setNome(usuario.nome);
@@ -38,29 +68,57 @@ export default function Usuarios() {
     setEmail(usuario.email);
   };
 
-  // Salva as alterações na lista
-  const salvarAlteracoes = () => {
+  const salvarAlteracoes = async () => {
     if (!nome || !CPF || !email) {
       Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
 
-    setUsuarios(
-      usuarios.map((u) =>
-        u.id === editandoId ? { ...u, nome, CPF, email } : u
-      )
+    const novaLista = usuarios.map((u) =>
+      u.id === editandoId ? { ...u, nome, CPF, email } : u
     );
 
-    // Limpa o formulário e sai do modo de edição
+    setUsuarios(novaLista);
+    await salvarNoStorage(novaLista);
+
     setEditandoId(null);
     setNome('');
     setCPF('');
     setEmail('');
   };
 
-  // Cancela a edição
   const cancelarEdicao = () => {
     setEditandoId(null);
+  };
+
+  // 2. Remove o usuário do estado e do AsyncStorage
+  const removerUsuario = async (id) => {
+    const novaLista = usuarios.filter((u) => u.id !== id);
+    setUsuarios(novaLista);
+    await salvarNoStorage(novaLista);
+  };
+
+  // Confirmação compatível com Web e Mobile
+  const confirmarExclusao = (id, nomeUsuario) => {
+    if (Platform.OS === 'web') {
+      const confirmou = window.confirm(`Deseja realmente remover ${nomeUsuario}?`);
+      if (confirmou) {
+        removerUsuario(id);
+      }
+    } else {
+      Alert.alert(
+        "Excluir Usuário",
+        `Deseja realmente remover ${nomeUsuario}?`,
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Excluir",
+            style: "destructive",
+            onPress: () => removerUsuario(id)
+          }
+        ]
+      );
+    }
   };
 
   return (
@@ -68,7 +126,6 @@ export default function Usuarios() {
       <Text style={styles.titulo}>LISTA DE USUÁRIOS</Text>
 
       {editandoId ? (
-        // Formulário de Edição
         <View style={styles.formulario}>
           <Text style={styles.subtitulo}>EDITAR USUÁRIO</Text>
 
@@ -109,10 +166,9 @@ export default function Usuarios() {
           </TouchableOpacity>
         </View>
       ) : (
-        // Lista de Usuários
         <FlatList
           data={usuarios}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <View style={styles.cartaoUsuario}>
@@ -122,12 +178,21 @@ export default function Usuarios() {
                 <Text style={styles.detalhe}>E-mail: {item.email}</Text>
               </View>
 
-              <TouchableOpacity
-                style={styles.botaoEditar}
-                onPress={() => iniciarEdicao(item)}
-              >
-                <Text style={styles.textoBotaoEditar}>EDITAR</Text>
-              </TouchableOpacity>
+              <View style={styles.acoesContainer}>
+                <TouchableOpacity
+                  style={styles.botaoEditar}
+                  onPress={() => iniciarEdicao(item)}
+                >
+                  <Text style={styles.textoBotaoEditar}>EDITAR</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.botaoExcluir}
+                  onPress={() => confirmarExclusao(item.id, item.nome)}
+                >
+                  <Text style={styles.textoBotaoExcluir}>EXCLUIR</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         />
@@ -140,14 +205,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#121212', // Fundo preto escuro
+    backgroundColor: '#121212',
   },
   titulo: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#E50914', // Vermelho destaque
+    color: '#E50914',
     letterSpacing: 1.5,
     marginTop: 20,
     textTransform: 'uppercase',
@@ -161,24 +226,24 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   formulario: {
-    backgroundColor: '#1E1E1E', // Preto levemente destacado
+    backgroundColor: '#1E1E1E',
     padding: 20,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E50914', // Borda vermelha
+    borderColor: '#E50914',
   },
   input: {
     backgroundColor: '#121212',
     borderWidth: 1,
     borderColor: '#333333',
-    color: '#FFFFFF', // Texto digitado em branco
+    color: '#FFFFFF',
     padding: 14,
     marginBottom: 16,
     borderRadius: 8,
     fontSize: 15,
   },
   botaoSalvar: {
-    backgroundColor: '#E50914', // Botão vermelho principal
+    backgroundColor: '#E50914',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -187,7 +252,7 @@ const styles = StyleSheet.create({
   botaoCancelar: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#FFFFFF', // Borda branca
+    borderColor: '#FFFFFF',
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -208,7 +273,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1E1E1E',
     borderLeftWidth: 4,
-    borderLeftColor: '#E50914', // Borda lateral em vermelho
+    borderLeftColor: '#E50914',
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
@@ -220,23 +285,42 @@ const styles = StyleSheet.create({
   nome: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Nome em branco
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   detalhe: {
     fontSize: 13,
-    color: '#B0B0B0', // Cinza claro para os detalhes
+    color: '#B0B0B0',
     marginTop: 2,
   },
+  acoesContainer: {
+    flexDirection: 'column',
+    gap: 8,
+  },
   botaoEditar: {
-    backgroundColor: '#E50914', // Botão de ação em vermelho
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    backgroundColor: '#E50914',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 6,
+    alignItems: 'center',
   },
   textoBotaoEditar: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 12,
   },
-})
+  botaoExcluir: {
+    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  textoBotaoExcluir: {
+    color: '#FF3B30',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+});
