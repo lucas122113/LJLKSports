@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Keyboard } from 'react-native';
+import { 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  View, 
+  ScrollView, 
+  Alert, 
+  Keyboard 
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CadastroUsuario({ navigation }) {
@@ -25,7 +34,6 @@ export default function CadastroUsuario({ navigation }) {
   };
 
   const lidarComSalvar = async () => {
-    // Esconde o teclado para garantir que o Alert apareça
     Keyboard.dismiss();
     setMensagemErro('');
 
@@ -102,7 +110,7 @@ export default function CadastroUsuario({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>CADASTRO DE USUÁRIO</Text>
 
       {/* Exibe mensagem de erro diretamente na tela */}
@@ -156,13 +164,13 @@ export default function CadastroUsuario({ navigation }) {
       >
         <Text style={styles.textoBotaoSalvar}>SALVAR</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 24,
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',

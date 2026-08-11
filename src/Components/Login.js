@@ -7,7 +7,8 @@ import {
   StyleSheet, 
   Alert, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  Keyboard
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,9 +16,25 @@ export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
+  // Função auxiliar para exibir alertas compatíveis com Web e Mobile
+  const exibirAlerta = (titulo, mensagem, onPressOk) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${titulo}\n\n${mensagem}`);
+      if (onPressOk) onPressOk();
+    } else {
+      Alert.alert(
+        titulo, 
+        mensagem, 
+        onPressOk ? [{ text: 'OK', onPress: onPressOk }] : [{ text: 'OK' }]
+      );
+    }
+  };
+
   const lidarComLogin = async () => {
+    Keyboard.dismiss();
+
     if (!email.trim() || !senha.trim()) {
-      Alert.alert('Atenção', 'Por favor, preencha o e-mail e a senha.');
+      exibirAlerta('Atenção', 'Por favor, preencha o e-mail e a senha.');
       return;
     }
 
@@ -26,20 +43,28 @@ export default function Login({ navigation }) {
       const listaSalva = await AsyncStorage.getItem('@lista_usuarios');
       const usuarios = listaSalva ? JSON.parse(listaSalva) : [];
 
-      // 2. Busca pelo e-mail e senha correspondentes
+      // 2. Busca pelo e-mail e senha correspondentes (com validação segura)
       const usuarioValido = usuarios.find(
-        (u) => u.email?.toLowerCase() === email.trim().toLowerCase() && u.senha === senha
+        (u) => u.email?.trim().toLowerCase() === email.trim().toLowerCase() && u.senha === senha.trim()
       );
 
       if (usuarioValido) {
-        Alert.alert('Sucesso', `Bem-vindo(a), ${usuarioValido.nome || 'Usuário'}!`);
-        navigation.navigate('Produtos');
+        exibirAlerta('Sucesso', `Bem-vindo(a), ${usuarioValido.nome || 'Usuário'}!`, () => {
+          // Limpa os campos ao logar
+          setEmail('');
+          setSenha('');
+          
+          // Navega para a tela desejada
+          if (navigation && navigation.navigate) {
+            navigation.navigate('Produtos'); 
+          }
+        });
       } else {
-        Alert.alert('Erro', 'E-mail ou senha incorretos.');
+        exibirAlerta('Erro', 'E-mail ou senha incorretos.');
       }
     } catch (e) {
       console.error('Erro ao ler login:', e);
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
+      exibirAlerta('Erro', 'Ocorreu um erro ao tentar fazer login.');
     }
   };
 

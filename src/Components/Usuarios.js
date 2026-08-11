@@ -11,8 +11,8 @@ export default function Usuarios() {
   const [nome, setNome] = useState('');
   const [CPF, setCPF] = useState('');
   const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
-  // 1. Carrega os usuários salvos no AsyncStorage assim que a tela abre
   useEffect(() => {
     carregarUsuarios();
   }, []);
@@ -23,22 +23,20 @@ export default function Usuarios() {
       if (dadosSalvos !== null) {
         setUsuarios(JSON.parse(dadosSalvos));
       } else {
-        // Se ainda não houver dados salvos, usa a lista padrão inicial
         const dadosIniciais = [
-          { id: '1', nome: 'Ana Souza', CPF: '111.222.333-44', email: 'ana.souza@email.com' },
-          { id: '2', nome: 'Lucas Lima', CPF: '555.666.777-88', email: 'lucas.lima@email.com' },
-          { id: '3', nome: 'Mariana Costa', CPF: '999.888.777-66', email: 'mariana.costa@email.com' },
-          { id: '4', nome: 'Pedro Alves', CPF: '444.555.666-77', email: 'pedro.alves@email.com' },
+          { id: '1', nome: 'Neymar da Silva Santos Junior', CPF: '971.110.971-10', email: 'Neymar.junior05021992@email.com', senha: '123' },
+          { id: '2', nome: 'Lionel Andres Messi Cuccittini', CPF: '151.819.301-01', email: 'lionel.messi@email.com', senha: '123' },
+          { id: '3', nome: 'Cristiano Ronaldo dos Santos Avero', CPF: '162.817.971-62', email: 'cristiano.ronaldo05021985@email.com', senha: '123' },
+          { id: '4', nome: 'Giorgian Daniel De Arrascaeta Benedetti', CPF: '141.010.100-10', email: 'giorgian.arrascaeta@email.com', senha: '123' },
         ];
         setUsuarios(dadosIniciais);
         await AsyncStorage.setItem(CHAVE_STORAGE, JSON.stringify(dadosIniciais));
       }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
-    }
+    } 
   };
 
-  // Função auxiliar para salvar a lista completa no storage
   const salvarNoStorage = async (novaLista) => {
     try {
       await AsyncStorage.setItem(CHAVE_STORAGE, JSON.stringify(novaLista));
@@ -66,16 +64,17 @@ export default function Usuarios() {
     setNome(usuario.nome);
     setCPF(usuario.CPF);
     setEmail(usuario.email);
+    setSenha(usuario.senha || '');
   };
 
   const salvarAlteracoes = async () => {
     if (!nome || !CPF || !email) {
-      Alert.alert('Erro', 'Preencha todos os campos.');
+      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
       return;
     }
 
     const novaLista = usuarios.map((u) =>
-      u.id === editandoId ? { ...u, nome, CPF, email } : u
+      u.id === editandoId ? { ...u, nome, CPF, email, senha: senha || u.senha } : u
     );
 
     setUsuarios(novaLista);
@@ -85,20 +84,23 @@ export default function Usuarios() {
     setNome('');
     setCPF('');
     setEmail('');
+    setSenha('');
   };
 
   const cancelarEdicao = () => {
     setEditandoId(null);
+    setNome('');
+    setCPF('');
+    setEmail('');
+    setSenha('');
   };
 
-  // 2. Remove o usuário do estado e do AsyncStorage
   const removerUsuario = async (id) => {
     const novaLista = usuarios.filter((u) => u.id !== id);
     setUsuarios(novaLista);
     await salvarNoStorage(novaLista);
   };
 
-  // Confirmação compatível com Web e Mobile
   const confirmarExclusao = (id, nomeUsuario) => {
     if (Platform.OS === 'web') {
       const confirmou = window.confirm(`Deseja realmente remover ${nomeUsuario}?`);
@@ -155,6 +157,15 @@ export default function Usuarios() {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Nova Senha (Opcional)"
+            placeholderTextColor="#888888"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
           />
 
           <TouchableOpacity style={styles.botaoSalvar} onPress={salvarAlteracoes}>
