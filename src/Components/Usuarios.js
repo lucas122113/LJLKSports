@@ -242,11 +242,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E50914',
+    borderColor: '#E50914',
   },
   input: {
     backgroundColor: '#121212',
     borderWidth: 1,
     borderColor: '#333333',
+    color: '#FFFFFF',
     color: '#FFFFFF',
     padding: 14,
     marginBottom: 16,
@@ -254,6 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   botaoSalvar: {
+    backgroundColor: '#E50914',
     backgroundColor: '#E50914',
     padding: 16,
     borderRadius: 8,
